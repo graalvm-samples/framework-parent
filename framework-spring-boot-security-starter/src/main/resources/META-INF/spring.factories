@@ -1,0 +1,4 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+com.fushun.framework.security.config.BasicTokenAutoConfiguration,\
+com.fushun.framework.security.config.CaptchaAutoConfiguration,\
+com.fushun.framework.security.config.IgnoredUrlsAutoConfiguration

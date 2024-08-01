@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <parent>
+    <artifactId>framework-data</artifactId>
+    <groupId>com.fushun.framework</groupId>
+    <version>2.1.0-SNAPSHOT</version>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>com.fushun.framework</groupId>
+  <artifactId>framework-spring-data-mybatis</artifactId>
+  <version>2.1.0-SNAPSHOT</version>
+
+  <name>framework-spring-data-mybatis</name>
+
+  <dependencies>
+
+    <dependency>
+      <groupId>com.baomidou</groupId>
+      <artifactId>mybatis-plus-spring-boot3-starter</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.alibaba</groupId>
+      <artifactId>druid-spring-boot-3-starter</artifactId>
+    </dependency>
+
+<!--    <dependency>-->
+<!--      <groupId>com.github.gavlyukovskiy</groupId>-->
+<!--      <artifactId>p6spy-spring-boot-starter</artifactId>-->
+<!--      <version>1.9.1</version>-->
+<!--      <exclusions>-->
+<!--        <exclusion>-->
+<!--          <groupId>p6spy</groupId>-->
+<!--          <artifactId>p6spy</artifactId>-->
+<!--        </exclusion>-->
+<!--      </exclusions>-->
+<!--    </dependency>-->
+
+<!--    <dependency>-->
+<!--      <groupId>p6spy</groupId>-->
+<!--      <artifactId>p6spy</artifactId>-->
+<!--      <version>3.9.1</version>-->
+<!--    </dependency>-->
+
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-jdbc</artifactId>
+    </dependency>
+
+    <!--MySQL Driver驱动包-->
+    <dependency>
+      <groupId>com.mysql</groupId>
+      <artifactId>mysql-connector-j</artifactId>
+    </dependency>
+
+    <!-- 自己编译的，没有从中央仓库获取 -->
+<!--    <dependency>-->
+<!--      <groupId>com.baomidou</groupId>-->
+<!--      <artifactId>dynamic-datasource-spring-boot3-starter</artifactId>-->
+<!--      <version>4.3.0-SNAPSHOT</version>-->
+<!--    </dependency>-->
+
+  </dependencies>
+
+</project>

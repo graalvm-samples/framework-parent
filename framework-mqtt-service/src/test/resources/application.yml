@@ -1,0 +1,15 @@
+# mqtt 配置
+mqtt:
+  url: tcp://127.0.0.1:1883
+  userName: admin
+  password: admin
+  #控制主题
+  control: local_control
+  #控制主题
+  controlResult: local_controlResult
+  #实时主题
+  deviceTopic: local_deviceInfo
+  #查询
+  deviceQuery: local_deviceQuery
+  #查询返回
+  deviceQueryResult: local_deviceQueryResult

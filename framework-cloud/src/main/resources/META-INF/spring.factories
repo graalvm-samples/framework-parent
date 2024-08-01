@@ -1,0 +1,3 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+com.fushun.framework.cloud.feign.FeignAutoConfiguration,\
+com.fushun.framework.cloud.feign.FeignSerializeConfig

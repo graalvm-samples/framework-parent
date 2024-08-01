@@ -1,0 +1,8 @@
+spring:
+  jpa:
+    database-platform: org.hibernate.dialect.MySQL5InnoDBDialect  #决定创建表的类型
+    hibernate:
+      dialect: org.hibernate.dialect.MySQLDialect
+      naming:
+        implicit-strategy: com.fushun.framework.jpa.hibernate.SpringImplicitNamingStrategy
+        physical-strategy: com.fushun.framework.jpa.hibernate.SpringPhysicalNamingStrategy

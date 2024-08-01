@@ -1,0 +1,9 @@
+#文件上传七牛云
+oss:
+  aliyun:
+    ossInternalEndPoint: oss-cn-chengdu.aliyuncs.com
+    ossEndPoint: oss-cn-chengdu.aliyuncs.com
+    ossAccessKeyId: XXXXXXXX
+    ossAccessKeySecret: XXXXXXX
+    ossBucketName: hsh-property
+    development: true

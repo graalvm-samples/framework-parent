@@ -1,0 +1,15 @@
+
+spring:
+  data:
+    redis:
+      host: r-bp10vv5sashfb0kkci.redis.rds.aliyuncs.com
+      port: 6379
+      password: RxcoZYC9PGVmHLAU
+      lettuce:
+        pool:
+          max-active: 200
+          max-wait: 6000
+          max-idle: 10
+          min-idle: 0
+      timeout: 3000
+      database: 15
