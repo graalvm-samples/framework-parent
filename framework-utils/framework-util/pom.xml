@@ -36,6 +36,10 @@
             <groupId>com.fushun.framework</groupId>
             <artifactId>framework-bean-properties</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.fushun.framework</groupId>
+            <artifactId>framework-bouncycastle.crypto.security</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>commons-codec</groupId>
