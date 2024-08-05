@@ -32,5 +32,7 @@ public class OSSConfig {
      */
     private Boolean development;
 
+    private String regionId;
+
     private FilesStorageEnum filesStorageEnum=FilesStorageEnum.QiNIU_OSS;
 }

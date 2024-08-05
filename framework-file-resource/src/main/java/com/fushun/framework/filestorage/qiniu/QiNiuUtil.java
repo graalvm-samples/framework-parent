@@ -9,6 +9,7 @@ import com.qiniu.common.QiniuException;
 import com.qiniu.common.Zone;
 import com.qiniu.storage.Configuration;
 import com.qiniu.storage.DownloadUrl;
+import com.qiniu.storage.Region;
 import com.qiniu.storage.UploadManager;
 import com.qiniu.util.Auth;
 import org.slf4j.Logger;
@@ -45,8 +46,8 @@ public class QiNiuUtil {
                     auth = Auth.create(ossConfig.getOssAccessKeyId(), ossConfig.getOssAccessKeySecret());
 
                     //第二种方式: 自动识别要上传的空间(bucket)的存储区域是华东、华北、华南。
-                    Zone z = Zone.autoZone();
-                    Configuration c = new Configuration(z);
+                    //https://developer.qiniu.com/kodo/1671/region-endpoint-fq
+                    Configuration c = new Configuration(Region.createWithRegionId(ossConfig.getRegionId()));
 
                     //创建上传对象
                     instance = new UploadManager(c);
