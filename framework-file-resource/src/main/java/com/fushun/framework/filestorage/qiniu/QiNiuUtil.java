@@ -92,6 +92,7 @@ public class QiNiuUtil {
 
     //简单上传，使用默认策略，只需要设置上传的空间名就可以了
     public static String getUpToken() {
+        QiNiuUtil.getOSSClient();
         return auth.uploadToken(ossConfig.getOssBucketName());
     }
     /**
@@ -113,6 +114,7 @@ public class QiNiuUtil {
 
 
     public static String getImgUrl(String fileName, String filePath) {
+        QiNiuUtil.getOSSClient();
         // domain   下载 domain, eg: qiniu.com【必须】
 // useHttps 是否使用 https【必须】
 // key      下载资源在七牛云存储的 key【必须】
@@ -137,6 +139,7 @@ public class QiNiuUtil {
     }
 
     public static String getDownloadUrl(String fileName, String filePath) {
+        QiNiuUtil.getOSSClient();
         // domain   下载 domain, eg: qiniu.com【必须】
 // useHttps 是否使用 https【必须】
 // key      下载资源在七牛云存储的 key【必须】

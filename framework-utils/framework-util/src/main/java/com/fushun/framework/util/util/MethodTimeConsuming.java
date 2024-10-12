@@ -20,7 +20,12 @@ public class MethodTimeConsuming {
     }
 
     public static float consuming() {
-        long m=ThreadLocalUtil.getData("MethodTimeConsuming");
+        Long m=ThreadLocalUtil.getData("MethodTimeConsuming");
+        if(m==null){
+            ThreadLocalUtil.removeKey("MethodTimeConsuming");
+            ThreadLocalUtil.removeKey("MethodTimeConsuming_num");
+            return 0f;
+        }
         float consuming = (float)(System.currentTimeMillis() - m) / 1000;
         Integer num=ThreadLocalUtil.getData("MethodTimeConsuming_num");
         if (ObjectUtil.isNull(num)){

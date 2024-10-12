@@ -91,4 +91,11 @@ public class UserDTO implements JsonGraalVMNativeBean {
      */
     private Boolean firstLoginUser=false;
 
+    /**
+     * openId
+     */
+    private String openId;
+
+    private String unionId;
+
 }

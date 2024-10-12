@@ -45,11 +45,11 @@ public class LogControllerAspect {
     public void doBefore(JoinPoint joinPoint) {
 
         // 接收到请求，记录请求内容
-        MethodTimeConsuming.begin();
         ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         if(attributes == null){
             return;
         }
+        MethodTimeConsuming.begin();
         HttpServletRequest request = attributes.getRequest();
         // 记录下请求内容
 //        String controllerMethod = joinPoint.getSignature().getDeclaringTypeName() + "." + joinPoint.getSignature().getName();
@@ -76,7 +76,9 @@ public class LogControllerAspect {
     @AfterReturning(returning = "obj", pointcut = "controller() || restController()")
     public void doAfterReturning(JoinPoint joinPoint, Object obj) {
         ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-        assert attributes != null;
+        if(attributes == null){
+            return;
+        }
         HttpServletRequest request = attributes.getRequest();
         String method = joinPoint.getSignature().getDeclaringTypeName() + "." + joinPoint.getSignature().getName();
         logger.info(" >>>>>>>>>>AfterReturning REQUEST_URL:[{}],METHOD:[{}]\n" +

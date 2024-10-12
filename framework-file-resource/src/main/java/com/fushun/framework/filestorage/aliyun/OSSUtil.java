@@ -17,8 +17,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 
 import java.io.*;
+import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.HashMap;
@@ -171,6 +174,28 @@ public class OSSUtil {
                 os.close();
             }
         }
+    }
+
+    /**
+     * 获得文件路径
+     * @param urlStr https://static.proteryhouseprivate.aiworkhelper.com/community/merchants_account/image/20240806142014867/%E7%8E%8B%E7%A6%8F%E9%A1%BA-%E6%AD%A3%E9%9D%A2-%E5%B0%8F.jpeg?e=1722957615&token=zVLJMMxPcavC0DGvrjIBL1KQ80yCeTLhNxax_g8w:4BwYEgAyBz1rCAtLyHnJY2Wl-Ak=
+     * @return
+     */
+    public static String getImageUrl(String urlStr){
+        try {
+            URL url = new URL(urlStr);
+            String path = url.getPath(); // 获取路径
+            String decodedPath = URLDecoder.decode(path, StandardCharsets.UTF_8); // 解码路径
+
+            // 获取不包含文件名的路径
+            String pathWithoutFileName = decodedPath.substring(0, decodedPath.lastIndexOf('/'));
+            String fileName = decodedPath.substring(path.lastIndexOf('/') + 1); // 获取文件名
+            logger.info("pathWithoutFileName:{},fileName:{}", pathWithoutFileName, fileName);
+            return getImgUrl(fileName,pathWithoutFileName+"/");
+        } catch (Exception e) {
+            logger.error("e",e);
+        }
+        return urlStr;
     }
 
     /**
