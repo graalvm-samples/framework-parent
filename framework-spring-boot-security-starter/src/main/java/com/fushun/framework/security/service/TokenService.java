@@ -41,6 +41,10 @@ public class TokenService
     @Value("${token.expireTime}")
     private int expireTime;
 
+    // 验证令牌有效期，相差不足20分钟，自动刷新缓存
+    @Value("${token.tokenRefreshThreshold}")
+    private int tokenRefreshThreshold;
+
 
     /**
      * token前缀
@@ -132,6 +136,7 @@ public class TokenService
         String token = UUIDUtil.getUUID().toString();
         loginUser.setToken(token);
         setUserAgent(loginUser);
+        loginUser.setLoginTime(System.currentTimeMillis());
         refreshToken(loginUser);
 
         return token;
@@ -147,7 +152,7 @@ public class TokenService
     {
         long expireTime = loginUser.getExpireTime();
         long currentTime = System.currentTimeMillis();
-        if (expireTime - currentTime <= MILLIS_MINUTE_TEN)
+        if ((expireTime - currentTime) <= (tokenRefreshThreshold * MILLIS_MINUTE))
         {
             refreshToken(loginUser);
         }
@@ -160,8 +165,7 @@ public class TokenService
      */
     public <T extends BaseLoginInfo>  void refreshToken(T loginUser)
     {
-        loginUser.setLoginTime(System.currentTimeMillis());
-        loginUser.setExpireTime(loginUser.getLoginTime() + expireTime * MILLIS_MINUTE);
+        loginUser.setExpireTime(System.currentTimeMillis() + expireTime * MILLIS_MINUTE);
         // 根据uuid将loginUser缓存
         String userKey = getTokenKey(loginUser.getToken());
         redisCache.setCacheObject(userKey, loginUser, expireTime, TimeUnit.MINUTES);
