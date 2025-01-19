@@ -55,8 +55,6 @@
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>33.2.1-jre</version>
-            <!--            <version>31.1-jre</version> &lt;!&ndash; 请使用最新的稳定版本 &ndash;&gt;-->
         </dependency>
 
         <dependency>

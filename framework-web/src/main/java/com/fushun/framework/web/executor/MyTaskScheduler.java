@@ -2,7 +2,7 @@ package com.fushun.framework.web.executor;
 
 import cn.hutool.core.util.ObjectUtil;
 import com.fushun.framework.util.util.UUIDUtil;
-import com.fushun.framework.web.config.filter.LogCostFilter;
+//import com.fushun.framework.web.config.filter.LogCostFilter;
 import org.slf4j.MDC;
 import org.springframework.scheduling.Trigger;
 import org.springframework.scheduling.concurrent.ConcurrentTaskScheduler;
@@ -34,23 +34,23 @@ public class MyTaskScheduler extends ConcurrentTaskScheduler {
 
     private Runnable decorateTask(Runnable task) {
         // not 100% sure about safety of this cast
-        return new MyRunnable((ScheduledMethodRunnable) task);
+        return new MyRunnable(task);
     }
 
     private static class MyRunnable implements Runnable {
 
-        private final ScheduledMethodRunnable runnable;
+        private final Runnable runnable;
 
-        public MyRunnable(ScheduledMethodRunnable runnable) {
+        public MyRunnable(Runnable runnable) {
             this.runnable = runnable;
         }
 
         @Override
         public void run() {
             //每一次调度的时候，都重新生成
-            if(ObjectUtil.isEmpty(MDC.get(LogCostFilter.MDC_KEY_REQ_ID))){
-                MDC.put(LogCostFilter.MDC_KEY_REQ_ID, UUIDUtil.getUUID().toString());
-            }
+//            if(ObjectUtil.isEmpty(MDC.get(LogCostFilter.MDC_KEY_REQ_ID))){
+//                MDC.put(LogCostFilter.MDC_KEY_REQ_ID, UUIDUtil.getUUID().toString());
+//            }
             try {
                 runnable.run();
             } finally {

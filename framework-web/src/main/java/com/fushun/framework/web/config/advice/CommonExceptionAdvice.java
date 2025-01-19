@@ -7,7 +7,10 @@ import com.fushun.framework.util.response.ApiResult;
 import com.fushun.framework.util.util.StringUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.Ordered;
+import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,10 +24,20 @@ import org.springframework.web.bind.annotation.*;
  */
 @ControllerAdvice
 @RestControllerAdvice
-@Order(value = Ordered.LOWEST_PRECEDENCE - 2)
-public class CommonExceptionAdvice extends DefaultControllerAdvice {
+//@Order(value = Ordered.LOWEST_PRECEDENCE - 2)
+public class CommonExceptionAdvice {
+
+    protected Logger logger = LoggerFactory.getLogger(CommonExceptionAdvice.class);
 
     private final String SERVER_MESSAGE = "系统异常，请联系管理员!";
+
+    protected HttpStatus getStatus(Throwable ex) {
+        ResponseStatus responseStatus = AnnotatedElementUtils.findMergedAnnotation(ex.getClass(), ResponseStatus.class);
+        if (responseStatus == null) {
+            return HttpStatus.OK;
+        }
+        return responseStatus.value();
+    }
 
     @ExceptionHandler({ConstraintViolationException.class})
     @ResponseStatus(HttpStatus.OK)
@@ -81,13 +94,14 @@ public class CommonExceptionAdvice extends DefaultControllerAdvice {
 
     /**
      * 指定 异常类型的拦截 处理
+     * TODO 需要业务系统实现这个代码，用于兼容不同的统一处理的兼容
      *
      * @param request
      * @param ex
      * @return
      */
-    @ExceptionHandler(Exception.class)
-    @ResponseBody
+//    @ExceptionHandler(Exception.class)
+//    @ResponseBody
     ResponseEntity<?> handleControllerException(HttpServletRequest request, Throwable ex) {
         HttpStatus status = getStatus(ex);
         String code = "SYSTEM_ERROR";

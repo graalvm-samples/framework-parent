@@ -16,7 +16,7 @@ import java.util.Map;
  * @param <T>
  */
 @Data
-public class ApiResult<T> implements JsonGraalVMNativeBean {
+public class ApiResult<T> implements CommonResult,JsonGraalVMNativeBean {
     /**
      * 如果是成功，则code为ok
      */

@@ -52,6 +52,10 @@ omitted for conflict with
 ```
 
 spring-boot 对应的spring-cloud版本 https://spring.io/projects/spring-cloud#overview
+
+spring-boot 对应的依赖版本
+https://docs.spring.io/spring-boot/appendix/dependency-versions/coordinates.html
+
 ```
 <dependency>
     <groupId>org.springframework.cloud</groupId>

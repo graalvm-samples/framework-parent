@@ -1,8 +1,10 @@
 package com.fushun.framework.util.json;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.core.JsonParser.Feature;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.StreamReadFeature;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.module.SimpleModule;
@@ -45,6 +47,26 @@ public class JsonMapper{
 
 
     private static JsonMapper jsonMapper;
+
+//    private static ObjectMapper objectMapper = new ObjectMapper();
+
+//    static {
+//        objectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
+//        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+//        objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL); // 忽略 null 值
+//        objectMapper.registerModules(new JavaTimeModule()); // 解决 LocalDateTime 的序列化
+//    }
+//
+//    /**
+//     * 初始化 objectMapper 属性
+//     * <p>
+//     * 通过这样的方式，使用 Spring 创建的 ObjectMapper Bean
+//     *
+//     * @param objectMapper ObjectMapper 对象
+//     */
+//    public static void init(ObjectMapper objectMapper) {
+//        JsonMapper.objectMapper = objectMapper;
+//    }
 
     public static ObjectMapper getObjectMapper(){
         ObjectMapper mapper = new ObjectMapper();
