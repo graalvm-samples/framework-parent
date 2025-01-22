@@ -1,5 +1,6 @@
 package com.fushun.framework.redis.config;
 
+import cn.hutool.core.collection.CollUtil;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
@@ -12,12 +13,14 @@ import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.RedisSerializer;
 
-public class LongRedisTemplate extends RedisTemplate<String, Long> {
-    public LongRedisTemplate() {
+import java.util.List;
 
-        ObjectMapper mapper = JsonMapper.getObjectMapper();
-        mapper.activateDefaultTyping(LaissezFaireSubTypeValidator.instance, ObjectMapper.DefaultTyping.NON_FINAL, JsonTypeInfo.As.PROPERTY);
-        mapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
+import static com.fushun.framework.util.json.JsonEnum.REDIS_TEMPLATE;
+
+public class LongRedisTemplate extends RedisTemplate<String, Long> {
+    public LongRedisTemplate(List<ObjectMapper> objectMappers) {
+        JsonMapper.init(CollUtil.getFirst(objectMappers));
+        ObjectMapper mapper = JsonMapper.getRedisObjectMapper(REDIS_TEMPLATE);
         Jackson2JsonRedisSerializer<Object> jackson2JsonRedisSerializer = new Jackson2JsonRedisSerializer<>(mapper, Object.class);
 
         this.setKeySerializer(RedisSerializer.string()); // key采用String的序列化方式
@@ -26,8 +29,8 @@ public class LongRedisTemplate extends RedisTemplate<String, Long> {
         this.setHashValueSerializer(jackson2JsonRedisSerializer); // hash的value序列化方式采用jackson
     }
 
-    public LongRedisTemplate(RedisConnectionFactory connectionFactory) {
-        this();
+    public LongRedisTemplate(RedisConnectionFactory connectionFactory, List<ObjectMapper> objectMappers) {
+        this(objectMappers);
         this.setConnectionFactory(connectionFactory);
         this.afterPropertiesSet();
     }

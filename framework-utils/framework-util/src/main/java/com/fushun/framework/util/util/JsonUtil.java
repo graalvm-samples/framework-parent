@@ -26,6 +26,8 @@ import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+import static com.fushun.framework.util.json.JsonEnum.BASE;
+
 /**
  *
  */
@@ -45,7 +47,7 @@ public class JsonUtil {
      */
     @SuppressWarnings("unchecked")
     public static HashMap<String, Object> jsonToHashMap(String jsonStr) {
-        ObjectMapper mapper = JsonMapper.getObjectMapper();
+        ObjectMapper mapper = JsonMapper.getObjectMapper(BASE);
 
         HashMap<String, Object> map = new HashMap<String, Object>();
         try {
@@ -70,7 +72,7 @@ public class JsonUtil {
      * @records <p>  fushun 2017年6月7日</p>
      */
     public static <K, V, T extends Map<K, V>> T jsonToMap(String jsonStr, Class<T> T, Class<K> keyClas, Class<V> valueClass) {
-        ObjectMapper mapper = JsonMapper.getObjectMapper();
+        ObjectMapper mapper = JsonMapper.getObjectMapper(BASE);
         try {
 
             MapType mapType = MapType.construct(T, SimpleType.construct(keyClas), SimpleType.construct(valueClass));
@@ -145,7 +147,7 @@ public class JsonUtil {
      * @return
      */
     public static JavaType getCollectionJavaType(Class<?> collectionClass, Class<?>... elementClasses) {
-        return JsonMapper.getObjectMapper().getTypeFactory().constructParametricType(collectionClass, elementClasses);
+        return JsonMapper.getObjectMapper(BASE).getTypeFactory().constructParametricType(collectionClass, elementClasses);
     }
 
     public static <T extends JsonGraalVMNativeBean> T jsonToClass(String jsonStr, JavaType javaType) {
@@ -177,8 +179,9 @@ public class JsonUtil {
     public static String classToJson(Iterable obj) {
         return classToJson_(obj);
     }
+
     private static String classToJson_(Object obj) {
-        ObjectMapper mapper = JsonMapper.getObjectMapper();
+        ObjectMapper mapper = JsonMapper.getObjectMapper(BASE);
         try {
 
             return mapper.writeValueAsString(obj);
@@ -211,7 +214,7 @@ public class JsonUtil {
     }
 
     private static String classToJson_(Object obj,String dateFormat) {
-        ObjectMapper mapper = JsonMapper.getObjectMapper();
+        ObjectMapper mapper = JsonMapper.getObjectMapper(BASE);
         try {
             SimpleDateFormat formatter=new SimpleDateFormat(dateFormat);
             mapper.setDateFormat(formatter);
@@ -238,7 +241,7 @@ public class JsonUtil {
     }
 
     private static String toJson_(Object obj) {
-        ObjectMapper mapper = JsonMapper.getObjectMapper();
+        ObjectMapper mapper = JsonMapper.getObjectMapper(BASE);
         try {
             String str = mapper.writeValueAsString(obj);
             return str;
@@ -260,7 +263,7 @@ public class JsonUtil {
      * @records <p>  fushun 2017年6月7日</p>
      */
     public static HashMap<String, Object> classToHashMap(JsonGraalVMNativeBean obj) {
-        ObjectMapper mapper = JsonMapper.getObjectMapper();
+        ObjectMapper mapper = JsonMapper.getObjectMapper(BASE);
         try {
             String str = mapper.writeValueAsString(obj);
             return mapper.readValue(str, HashMap.class);
@@ -281,7 +284,7 @@ public class JsonUtil {
      * @records <p>  fushun 2016年8月17日</p>
      */
     public static <T extends JsonGraalVMNativeBean> T hashMapToClass(Map<String, Object> map, Class<T> classs) {
-        ObjectMapper mapper = JsonMapper.getObjectMapper();
+        ObjectMapper mapper = JsonMapper.getObjectMapper(BASE);
         try {
             String str = mapper.writeValueAsString(map);
             return mapper.readValue(str, classs);
@@ -306,7 +309,7 @@ public class JsonUtil {
         if (StringUtils.isEmpty(obj)) {
             return null;
         }
-        ObjectMapper mapper = JsonMapper.getObjectMapper();
+        ObjectMapper mapper = JsonMapper.getObjectMapper(BASE);
 
         ArrayType valueType = TypeFactory.defaultInstance().constructArrayType(classs);
         try {
@@ -332,7 +335,7 @@ public class JsonUtil {
         if (StringUtils.isEmpty(obj)) {
             return null;
         }
-        ObjectMapper mapper = JsonMapper.getObjectMapper();
+        ObjectMapper mapper = JsonMapper.getObjectMapper(BASE);
         MapType j = MapType.construct(HashMap.class, SimpleType.construct(String.class), SimpleType.construct(Object.class));
         CollectionType collectionType = CollectionType.construct(List.class, j);
         try {
@@ -363,7 +366,7 @@ public class JsonUtil {
         if (StringUtils.isEmpty(jsonStr)) {
             return null;
         }
-        ObjectMapper mapper = JsonMapper.getObjectMapper();
+        ObjectMapper mapper = JsonMapper.getObjectMapper(BASE);
         MapType mapType = MapType.construct(HashMap.class, SimpleType.construct(keyCls), SimpleType.construct(valueClass));
         CollectionType collectionType = CollectionType.construct(List.class, mapType);
         try {
@@ -380,7 +383,7 @@ public class JsonUtil {
         if (StringUtils.isEmpty(jsonStr)) {
             return null;
         }
-        ObjectMapper mapper = JsonMapper.getObjectMapper();
+        ObjectMapper mapper = JsonMapper.getObjectMapper(BASE);
 //        MapType mapType = MapType.construct(LinkedHashMap.class, SimpleType.construct(keyCls), SimpleType.construct(valueClass));
         TypeFactory typeFactory = mapper.getTypeFactory();
         MapType mapType = typeFactory.constructMapType(LinkedHashMap.class, keyCls, valueClass);
@@ -411,7 +414,7 @@ public class JsonUtil {
         if (StringUtils.isEmpty(jsonStr)) {
             return null;
         }
-        ObjectMapper mapper = JsonMapper.getObjectMapper().setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
+        ObjectMapper mapper = JsonMapper.getObjectMapper(BASE).setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         JavaType j = SimpleType.construct(cls);
         CollectionType collectionType = CollectionType.construct(List.class, j);

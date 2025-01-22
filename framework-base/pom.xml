@@ -50,6 +50,10 @@
             <artifactId>springdoc-openapi-starter-webmvc-api</artifactId>
         </dependency>
         <dependency>
+            <groupId>com.github.xingfudeshi</groupId> <!-- TODO 芋艿：https://github.com/xiaoymin/knife4j/issues/874 -->
+            <artifactId>knife4j-openapi3-jakarta-spring-boot-starter</artifactId>
+        </dependency>
+        <dependency>
             <groupId>jakarta.persistence</groupId>
             <artifactId>jakarta.persistence-api</artifactId>
         </dependency>
