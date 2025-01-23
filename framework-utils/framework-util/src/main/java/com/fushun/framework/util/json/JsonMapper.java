@@ -75,7 +75,7 @@ public class JsonMapper{
                 if (JsonMapper.objectMapper == null) { // 第二次检查
                     logger.info("JsonMapper init");
                     JsonMapper.objectMapper = objectMapper;
-
+                    getObjectMapperObj();
                 }
             }
         }
@@ -91,7 +91,7 @@ public class JsonMapper{
             return objectMapper1;
         }
 
-        ObjectMapper mapper = getObjectMapperObj();
+        ObjectMapper mapper = JsonMapper.objectMapper.copy();
         contextHolder.put(jsonEnum, mapper);
         return mapper;
     }
@@ -105,7 +105,7 @@ public class JsonMapper{
             return objectMapper1;
         }
 
-        ObjectMapper mapper = getObjectMapperObj();
+        ObjectMapper mapper = JsonMapper.objectMapper.copy();
         mapper.activateDefaultTyping(LaissezFaireSubTypeValidator.instance, ObjectMapper.DefaultTyping.NON_FINAL, JsonTypeInfo.As.PROPERTY);
         mapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
         contextHolder.put(jsonEnum, mapper);
@@ -113,26 +113,35 @@ public class JsonMapper{
     }
 
     public static ObjectMapper getObjectMapperObj(){
-        ObjectMapper mapper = JsonMapper.objectMapper.copy();
+        ObjectMapper mapper = JsonMapper.objectMapper;
         //https://blog.csdn.net/weixin_44130081/article/details/89678450
         // 配置常用设置
         mapper.setSerializationInclusion(Include.NON_NULL);
 
         // 1.1 创建 SimpleModule 对象
-        SimpleModule simpleModule = new SimpleModule();
-        simpleModule
+
+        JavaTimeModule javaTimeModule = new JavaTimeModule();
+        javaTimeModule
                 // 新增 Long 类型序列化规则，数值超过 2^53-1，在 JS 会出现精度丢失问题，因此 Long 自动序列化为字符串类型
                 .addSerializer(Long.class, NumberSerializer.INSTANCE)
                 .addSerializer(Long.TYPE, NumberSerializer.INSTANCE)
-                .addSerializer(LocalDate.class, LocalDateSerializer.INSTANCE)
-                .addDeserializer(LocalDate.class, LocalDateDeserializer.INSTANCE)
-                .addSerializer(LocalTime.class, LocalTimeSerializer.INSTANCE)
-                .addDeserializer(LocalTime.class, LocalTimeDeserializer.INSTANCE)
+//                .addSerializer(LocalDate.class, LocalDateSerializer.INSTANCE)
+//                .addDeserializer(LocalDate.class, LocalDateDeserializer.INSTANCE)
+                .addSerializer(LocalDate.class, new LocalDateSerializer(DateTimeFormatter.ofPattern("yyyy-MM-dd")))
+                .addDeserializer(LocalDate.class, new LocalDateDeserializer(DateTimeFormatter.ofPattern("yyyy-MM-dd")))
+//                .addSerializer(LocalTime.class, LocalTimeSerializer.INSTANCE)
+//                .addDeserializer(LocalTime.class, LocalTimeDeserializer.INSTANCE)
+                .addSerializer(LocalTime.class, new LocalTimeSerializer(DateTimeFormatter.ofPattern("HH:mm:ss")))
+                .addDeserializer(LocalTime.class, new LocalTimeDeserializer(DateTimeFormatter.ofPattern("HH:mm:ss")))
                 // 新增 LocalDateTime 序列化、反序列化规则，使用 Long 时间戳
-                .addSerializer(LocalDateTime.class, TimestampLocalDateTimeSerializer.INSTANCE)
-                .addDeserializer(LocalDateTime.class, TimestampLocalDateTimeDeserializer.INSTANCE);
+//                .addSerializer(LocalDateTime.class, TimestampLocalDateTimeSerializer.INSTANCE)
+//                .addDeserializer(LocalDateTime.class, TimestampLocalDateTimeDeserializer.INSTANCE)
+                .addSerializer(LocalDateTime.class, new LocalDateTimeSerializer(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
+                .addDeserializer(LocalDateTime.class, new LocalDateTimeDeserializer(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+        mapper.registerModule(javaTimeModule);
 
         //注册一个统一的枚举序列方法，实现IEnum接口的枚举序列化时取desc字段
+        SimpleModule simpleModule = new SimpleModule();
         simpleModule.addSerializer(IBaseEnum.class, new EnumsCodec());
         mapper.registerModule(simpleModule);
 
