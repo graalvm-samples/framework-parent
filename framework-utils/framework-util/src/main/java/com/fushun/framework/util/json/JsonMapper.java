@@ -23,6 +23,7 @@ import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalTimeSerializer;
 import com.fushun.framework.base.IBaseEnum;
 import com.fushun.framework.exception.DynamicBaseException;
+import com.fushun.framework.util.json.databind.CustomLocalDateTimeDeserializer;
 import com.fushun.framework.util.json.databind.NumberSerializer;
 import com.fushun.framework.util.json.databind.TimestampLocalDateTimeDeserializer;
 import com.fushun.framework.util.json.databind.TimestampLocalDateTimeSerializer;
@@ -120,7 +121,7 @@ public class JsonMapper{
 
         // 1.1 创建 SimpleModule 对象
 
-        JavaTimeModule javaTimeModule = new JavaTimeModule();
+        SimpleModule javaTimeModule = new SimpleModule();
         javaTimeModule
                 // 新增 Long 类型序列化规则，数值超过 2^53-1，在 JS 会出现精度丢失问题，因此 Long 自动序列化为字符串类型
                 .addSerializer(Long.class, NumberSerializer.INSTANCE)
@@ -137,7 +138,9 @@ public class JsonMapper{
 //                .addSerializer(LocalDateTime.class, TimestampLocalDateTimeSerializer.INSTANCE)
 //                .addDeserializer(LocalDateTime.class, TimestampLocalDateTimeDeserializer.INSTANCE)
                 .addSerializer(LocalDateTime.class, new LocalDateTimeSerializer(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
-                .addDeserializer(LocalDateTime.class, new LocalDateTimeDeserializer(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+                .addDeserializer(LocalDateTime.class, new CustomLocalDateTimeDeserializer())
+//                .addDeserializer(LocalDateTime.class, new LocalDateTimeDeserializer(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
+        ;
         mapper.registerModule(javaTimeModule);
 
         //注册一个统一的枚举序列方法，实现IEnum接口的枚举序列化时取desc字段
