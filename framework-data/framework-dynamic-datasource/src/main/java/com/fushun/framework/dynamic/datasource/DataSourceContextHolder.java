@@ -1,21 +1,19 @@
 package com.fushun.framework.dynamic.datasource;
 
-import java.util.concurrent.ConcurrentHashMap;
-
 public class DataSourceContextHolder {
 
-    private static final ConcurrentHashMap<Long,String> contextHolder = new ConcurrentHashMap<>();
+    private static final ThreadLocal<String> contextHolder = new ThreadLocal<>();
 
     public static void setDataSource(String dataSourceType) {
-        contextHolder.put(Thread.currentThread().threadId(),dataSourceType);
+        contextHolder.set(dataSourceType);
     }
 
     public static String getDataSource() {
-        return contextHolder.get(Thread.currentThread().threadId());
+        return contextHolder.get();
     }
 
     public static void clearDataSource() {
-        contextHolder.remove(Thread.currentThread().threadId());
+        contextHolder.remove();
     }
 }
 

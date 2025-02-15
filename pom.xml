@@ -33,6 +33,7 @@
     </modules>
 
     <properties>
+        <enable.preview>true</enable.preview>
         <java.version>21</java.version>
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
@@ -244,8 +245,9 @@
                 <version>${hutool-6.version}</version>
             </dependency>
 
+            <!-- TODO 芋艿：https://github.com/xiaoymin/knife4j/issues/874 -->
             <dependency>
-                <groupId>com.github.xingfudeshi</groupId> <!-- TODO 芋艿：https://github.com/xiaoymin/knife4j/issues/874 -->
+                <groupId>com.github.xingfudeshi</groupId>
                 <artifactId>knife4j-openapi3-jakarta-spring-boot-starter</artifactId>
                 <version>4.6.0</version>
             </dependency>
