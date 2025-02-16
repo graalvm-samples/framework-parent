@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
+import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser.Feature;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.StreamReadFeature;
@@ -32,6 +33,7 @@ import com.fushun.framework.util.util.DateUtil;
 import com.fushun.framework.util.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
@@ -147,6 +149,17 @@ public class JsonMapper{
         SimpleModule simpleModule = new SimpleModule();
         simpleModule.addSerializer(IBaseEnum.class, new EnumsCodec());
         mapper.registerModule(simpleModule);
+
+        // 全局忽略 MultipartFile 类型
+        SimpleModule module = new SimpleModule();
+        module.addSerializer(MultipartFile.class, new JsonSerializer<MultipartFile>() {
+            @Override
+            public void serialize(MultipartFile value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
+                // 不做任何操作，直接忽略该字段
+                gen.writeNull();
+            }
+        });
+        mapper.registerModule(module);
 
         // 允许单引号、允许不带引号的字段名称
         mapper.configure(Feature.ALLOW_SINGLE_QUOTES, true);
