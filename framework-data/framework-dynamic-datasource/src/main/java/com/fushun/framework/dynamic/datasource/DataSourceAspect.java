@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 
 @Aspect
 @Component
-@Order(Ordered.HIGHEST_PRECEDENCE+3)
+@Order(Ordered.HIGHEST_PRECEDENCE + 3)
 @Slf4j
 public class DataSourceAspect {
 
@@ -32,11 +32,11 @@ public class DataSourceAspect {
 
     @Before("dataSourceAnnotatedClasses()")
     public void switchDataSource(JoinPoint point) {
-        try{
+        try {
             // 获取目标方法
             MethodSignature methodSignature = (MethodSignature) point.getSignature();
 
-            // 获取目标方法上的 @UseDataSource 注解
+            // 获取目标方法所在类上的 @UseDataSource 注解
             UseDataSource useDataSourceAnnotation = methodSignature.getMethod().getDeclaringClass().getAnnotation(UseDataSource.class);
 
             // 如果注解不为 null，则可以获取注解的值
@@ -45,8 +45,8 @@ public class DataSourceAspect {
                 // 使用 dataSourceName 进行切换数据源逻辑
                 DataSourceContextHolder.setDataSource(dataSourceName);
             }
-        }catch (Exception err){
-            log.error("",err);
+        } catch (Exception err) {
+            log.error("", err);
         }
     }
 
