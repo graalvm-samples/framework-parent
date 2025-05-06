@@ -20,6 +20,8 @@ public class CustomizedSqlInjector extends DefaultSqlInjector {
         methodList.add(new InsertBatchMethod("InsertBatch"));
         methodList.add(new UpdateBatchMethod("UpdateBatch"));
         methodList.add(new MysqlInsertOrUpdateBath("MysqlInsertOrUpdate"));
+        methodList.add(new DeleteAbsoluteById("deleteAbsoluteById"));
+        methodList.add(new DeleteAbsoluteByIds("deleteAbsoluteByIds"));
         return methodList;
     }
 }
