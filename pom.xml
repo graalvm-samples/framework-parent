@@ -24,7 +24,7 @@
         <module>framework-logs</module>
         <module>framework-test</module>
         <module>framework-web</module>
-        <module>framework-spring-boot-security-starter</module>
+<!--        <module>framework-spring-boot-security-starter</module>-->
         <module>framework-mqtt-service</module>
         <module>framework-data</module>
         <module>framework-cloud</module>
