@@ -39,25 +39,25 @@ public class DataSourceAspect {
     @Pointcut("dataSourceAnnotatedClasses() || dataSourceAnnotatedMethods()")
     public void combinedDataSourcePointcut() {}
 
-    @Before("combinedDataSourcePointcut()")
-    public void switchDataSource(JoinPoint point) {
-        try {
-            // 获取目标方法
-            MethodSignature methodSignature = (MethodSignature) point.getSignature();
-
-            // 获取目标方法所在类上的 @UseDataSource 注解
-            UseDataSource useDataSourceAnnotation = methodSignature.getMethod().getDeclaringClass().getAnnotation(UseDataSource.class);
-
-            // 如果注解不为 null，则可以获取注解的值
-            if (useDataSourceAnnotation != null) {
-                String dataSourceName = useDataSourceAnnotation.value();
-                // 使用 dataSourceName 进行切换数据源逻辑
-                DataSourceContextHolder.setDataSource(dataSourceName);
-            }
-        } catch (Exception err) {
-            log.error("", err);
-        }
-    }
+//    @Before("combinedDataSourcePointcut()")
+//    public void switchDataSource(JoinPoint point) {
+//        try {
+//            // 获取目标方法
+//            MethodSignature methodSignature = (MethodSignature) point.getSignature();
+//
+//            // 获取目标方法所在类上的 @UseDataSource 注解
+//            UseDataSource useDataSourceAnnotation = methodSignature.getMethod().getDeclaringClass().getAnnotation(UseDataSource.class);
+//
+//            // 如果注解不为 null，则可以获取注解的值
+//            if (useDataSourceAnnotation != null) {
+//                String dataSourceName = useDataSourceAnnotation.value();
+//                // 使用 dataSourceName 进行切换数据源逻辑
+//                DataSourceContextHolder.setDataSource(dataSourceName);
+//            }
+//        } catch (Exception err) {
+//            log.error("", err);
+//        }
+//    }
 
     @Around("combinedDataSourcePointcut()")
     public Object around(ProceedingJoinPoint joinPoint) throws Throwable {
@@ -68,6 +68,8 @@ public class DataSourceAspect {
         if(ObjectUtil.isEmpty(useDataSourceName)){
             useDataSourceName="yudaoDataSource";
         }
+        // 使用 dataSourceName 进行切换数据源逻辑
+        DataSourceContextHolder.setDataSource(useDataSourceName);
         String tmName = useDataSourceName + "TransactionManager";
 
         PlatformTransactionManager tm = SpringContextUtil.getAppContext().getBean(tmName, PlatformTransactionManager.class);
@@ -81,14 +83,16 @@ public class DataSourceAspect {
                 throw e; // 运行时异常直接抛出
             } catch (Throwable e) {
                 throw new DynamicBaseException(e,"TransactionManager exception","TransactionManager exception");  // 异常转换为RuntimeException以触发回滚
+            }finally {
+                DataSourceContextHolder.clearDataSource();
             }
         });
     }
 
-    @After("combinedDataSourcePointcut()")
-    public void restoreDataSource(JoinPoint point) {
-        DataSourceContextHolder.clearDataSource();
-    }
+//    @After("combinedDataSourcePointcut()")
+//    public void restoreDataSource(JoinPoint point) {
+//        DataSourceContextHolder.clearDataSource();
+//    }
 
     // 辅助方法：获取类或方法上的 @UseDataSource 注解
     private UseDataSource getUseDataSourceAnnotation(MethodSignature signature) {
