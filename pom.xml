@@ -385,6 +385,13 @@
                 <enabled>false</enabled>
             </snapshots>
         </repository>
+        <repository>
+            <id>maven2</id>
+            <url>https://repo1.maven.org/maven2</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
     </repositories>
 
 
