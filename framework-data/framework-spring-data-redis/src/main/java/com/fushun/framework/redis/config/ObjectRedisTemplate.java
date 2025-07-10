@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator;
+import com.fushun.framework.util.json.JsonEnum;
 import com.fushun.framework.util.json.JsonMapper;
 import org.springframework.data.redis.connection.DefaultStringRedisConnection;
 import org.springframework.data.redis.connection.RedisConnection;
@@ -14,7 +15,7 @@ import org.springframework.data.redis.serializer.RedisSerializer;
 
 public class ObjectRedisTemplate<T> extends RedisTemplate<String, T> {
     public ObjectRedisTemplate() {
-        ObjectMapper mapper = JsonMapper.getObjectMapper();
+        ObjectMapper mapper = JsonMapper.getObjectMapper(JsonEnum.BASE);
         mapper.activateDefaultTyping(LaissezFaireSubTypeValidator.instance, ObjectMapper.DefaultTyping.NON_FINAL, JsonTypeInfo.As.PROPERTY);
         mapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
         Jackson2JsonRedisSerializer<Object> jackson2JsonRedisSerializer = new Jackson2JsonRedisSerializer<>(mapper, Object.class);

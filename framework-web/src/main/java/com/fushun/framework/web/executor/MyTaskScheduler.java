@@ -2,12 +2,11 @@ package com.fushun.framework.web.executor;
 
 import cn.hutool.core.util.ObjectUtil;
 import com.fushun.framework.util.util.UUIDUtil;
-import com.fushun.framework.web.config.filter.LogCostFilter;
 import org.slf4j.MDC;
 import org.springframework.scheduling.Trigger;
 import org.springframework.scheduling.concurrent.ConcurrentTaskScheduler;
 import org.springframework.scheduling.support.ScheduledMethodRunnable;
-
+import com.fushun.framework.web.config.filter.LogCostFilter;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -34,14 +33,14 @@ public class MyTaskScheduler extends ConcurrentTaskScheduler {
 
     private Runnable decorateTask(Runnable task) {
         // not 100% sure about safety of this cast
-        return new MyRunnable((ScheduledMethodRunnable) task);
+        return new MyRunnable(task);
     }
 
     private static class MyRunnable implements Runnable {
 
-        private final ScheduledMethodRunnable runnable;
+        private final Runnable runnable;
 
-        public MyRunnable(ScheduledMethodRunnable runnable) {
+        public MyRunnable(Runnable runnable) {
             this.runnable = runnable;
         }
 

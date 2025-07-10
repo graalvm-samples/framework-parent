@@ -43,7 +43,7 @@ public final class ConverterUtil {
     private static final Logger logger = LoggerFactory.getLogger(ConverterUtil.class);
     private static final Map<String, BeanCopier> CACHED_COPIER_MAP = new ConcurrentHashMap<String, BeanCopier>();
     private static final Map<String, ObjectConverter> CACHED_CUSTOM_CONVERTER_MAP = new ConcurrentHashMap<String, ObjectConverter>();
-    private static final Map<String, EInvokeMethod> CACHED_INVOKE_METHOD = new HashMap<String, ConverterUtil.EInvokeMethod>();
+    private static final Map<String, EInvokeMethod> CACHED_INVOKE_METHOD = new HashMap<String, EInvokeMethod>();
 
     /**
      * sourceList集合中所有的数据赋值到List&lttarget&gt集合类型

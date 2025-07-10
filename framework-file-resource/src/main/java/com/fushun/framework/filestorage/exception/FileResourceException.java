@@ -36,7 +36,7 @@ public class FileResourceException extends BusinessException {
     /**
      * 异常错误定义
      */
-    public enum FileResourceExceptionEnum implements FileResourceException.IFileResourceExceptionEnum {
+    public enum FileResourceExceptionEnum implements IFileResourceExceptionEnum {
         UPLOAD_FILE_ERROR( "系统错误"),
         GET_OSS_URL_ERROR("获取oss文件URL失败")
         ;

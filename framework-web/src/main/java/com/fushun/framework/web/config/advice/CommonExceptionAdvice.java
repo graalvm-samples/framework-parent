@@ -7,7 +7,10 @@ import com.fushun.framework.util.response.ApiResult;
 import com.fushun.framework.util.util.StringUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.Ordered;
+import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -81,6 +84,7 @@ public class CommonExceptionAdvice extends DefaultControllerAdvice {
 
     /**
      * 指定 异常类型的拦截 处理
+     * TODO 需要业务系统实现这个代码，用于兼容不同的统一处理的兼容
      *
      * @param request
      * @param ex

@@ -7,16 +7,16 @@ import java.util.concurrent.TimeUnit;
 
 public class ThreadLocalUtil {
 
-    static final ConcurrentHashMap<Long, ConcurrentHashMap<String, TimedValue>> map =
-            new ConcurrentHashMap<>();
+    static final ThreadLocal<ConcurrentHashMap<String, TimedValue>> map =
+            new ThreadLocal<ConcurrentHashMap<String, TimedValue>>();
 
-    // 定时任务的调度器
-    private static final ScheduledExecutorService cleanupExecutor = Executors.newScheduledThreadPool(1, Thread.ofVirtual().factory());
-
-    static {
-        // 安排清理任务每小时运行一次
-        cleanupExecutor.scheduleAtFixedRate(ThreadLocalUtil::cleanup, 1, 1, TimeUnit.HOURS);
-    }
+//    // 定时任务的调度器
+//    private static final ScheduledExecutorService cleanupExecutor = Executors.newScheduledThreadPool(1, Thread.ofVirtual().factory());
+//
+//    static {
+//        // 安排清理任务每小时运行一次
+//        cleanupExecutor.scheduleAtFixedRate(ThreadLocalUtil::cleanup, 1, 1, TimeUnit.HOURS);
+//    }
 
     public static <T> void setData(String key, T data) {
         get().put(key, new TimedValue(data));
@@ -33,28 +33,34 @@ public class ThreadLocalUtil {
     }
 
     private static ConcurrentHashMap<String, TimedValue> get() {
-        long virtualThreadId = Thread.currentThread().threadId();
-        return map.computeIfAbsent(virtualThreadId, k -> new ConcurrentHashMap<>());
+        ConcurrentHashMap<String,TimedValue> concurrentHashMap=map.get();
+        if(concurrentHashMap==null){
+            map.set(new ConcurrentHashMap<>());
+        }
+        return  map.get();
+
+//        long virtualThreadId = Thread.currentThread().threadId();
+//        return map.computeIfAbsent(virtualThreadId, k -> new ConcurrentHashMap<>());
     }
 
-    public static void remove() {
-        long virtualThreadId = Thread.currentThread().threadId();
-        map.remove(virtualThreadId);
-    }
+//    public static void remove() {
+//        long virtualThreadId = Thread.currentThread().threadId();
+//        map.remove(virtualThreadId);
+//    }
 
     public static void removeKey(String key) {
         get().remove(key);
     }
 
-    private static void cleanup() {
-        long cutoffTime = System.currentTimeMillis() - TimeUnit.HOURS.toMillis(1);
-        for (Long threadId : map.keySet()) {
-            ConcurrentHashMap<String, TimedValue> dataMap = map.get(threadId);
-            if (dataMap != null) {
-                dataMap.entrySet().removeIf(entry -> entry.getValue().lastAccessTime < cutoffTime);
-            }
-        }
-    }
+//    private static void cleanup() {
+//        long cutoffTime = System.currentTimeMillis() - TimeUnit.HOURS.toMillis(1);
+//        for (Long threadId : map.keySet()) {
+//            ConcurrentHashMap<String, TimedValue> dataMap = map.get(threadId);
+//            if (dataMap != null) {
+//                dataMap.entrySet().removeIf(entry -> entry.getValue().lastAccessTime < cutoffTime);
+//            }
+//        }
+//    }
 
     // 包装类，用于存储值和时间戳
     private static class TimedValue {

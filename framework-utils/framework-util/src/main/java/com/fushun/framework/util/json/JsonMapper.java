@@ -1,10 +1,18 @@
 package com.fushun.framework.util.json;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
+import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser.Feature;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.StreamReadFeature;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.*;
+import com.fasterxml.jackson.databind.cfg.ConstructorDetector;
+import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.util.JSONPObject;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -15,11 +23,17 @@ import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalTimeSerializer;
 import com.fushun.framework.base.IBaseEnum;
+import com.fushun.framework.exception.DynamicBaseException;
+import com.fushun.framework.util.json.databind.CustomLocalDateTimeDeserializer;
+import com.fushun.framework.util.json.databind.NumberSerializer;
+import com.fushun.framework.util.json.databind.TimestampLocalDateTimeDeserializer;
+import com.fushun.framework.util.json.databind.TimestampLocalDateTimeSerializer;
 import com.fushun.framework.util.util.BeanUtils;
 import com.fushun.framework.util.util.DateUtil;
 import com.fushun.framework.util.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
@@ -29,7 +43,9 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Map;
 import java.util.TimeZone;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 简单封装Jackson，实现JSON String<->Java Object的Mapper.
@@ -43,26 +59,110 @@ public class JsonMapper{
 
     private static Logger logger = LoggerFactory.getLogger(JsonMapper.class);
 
-
     private static JsonMapper jsonMapper;
 
-    public static ObjectMapper getObjectMapper(){
-        ObjectMapper mapper = new ObjectMapper();
+    private static volatile ObjectMapper objectMapper;
+
+    private static final ConcurrentHashMap<JsonEnum,ObjectMapper> contextHolder = new ConcurrentHashMap<>();
+
+    /**
+     * 初始化 objectMapper 属性
+     * <p>
+     * 通过这样的方式，使用 Spring 创建的 ObjectMapper Bean
+     *
+     * @param objectMapper ObjectMapper 对象
+     */
+    public static void init(ObjectMapper objectMapper) {
+        if (JsonMapper.objectMapper == null) { // 第一次检查
+            synchronized (JsonMapper.class) {
+                if (JsonMapper.objectMapper == null) { // 第二次检查
+                    logger.info("JsonMapper init");
+                    if(objectMapper==null){
+                        objectMapper = new ObjectMapper();
+                    }
+                    JsonMapper.objectMapper = objectMapper;
+                    getObjectMapperObj();
+                }
+            }
+        }
+    }
+
+
+    public static ObjectMapper getObjectMapper(JsonEnum jsonEnum){
+        if (JsonMapper.objectMapper == null) {
+            throw new DynamicBaseException("OBJECTMAPPER_IS_NULL","ObjectMapper 是 null");
+        }
+        ObjectMapper objectMapper1=contextHolder.get(jsonEnum);
+        if(objectMapper1!=null){
+            return objectMapper1;
+        }
+
+        ObjectMapper mapper = JsonMapper.objectMapper.copy();
+        contextHolder.put(jsonEnum, mapper);
+        return mapper;
+    }
+
+    public static ObjectMapper getRedisObjectMapper(JsonEnum jsonEnum){
+        if (JsonMapper.objectMapper == null) {
+            throw new DynamicBaseException("OBJECTMAPPER_IS_NULL","ObjectMapper 是 null");
+        }
+        ObjectMapper objectMapper1=contextHolder.get(jsonEnum);
+        if(objectMapper1!=null){
+            return objectMapper1;
+        }
+
+        ObjectMapper mapper = JsonMapper.objectMapper.copy();
+        mapper.activateDefaultTyping(LaissezFaireSubTypeValidator.instance, ObjectMapper.DefaultTyping.NON_FINAL, JsonTypeInfo.As.PROPERTY);
+        mapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
+        contextHolder.put(jsonEnum, mapper);
+        return mapper;
+    }
+
+    public static ObjectMapper getObjectMapperObj(){
+        ObjectMapper mapper = JsonMapper.objectMapper;
         //https://blog.csdn.net/weixin_44130081/article/details/89678450
+        // 配置常用设置
         mapper.setSerializationInclusion(Include.NON_NULL);
-        JavaTimeModule javaTimeModule = new JavaTimeModule();
-        javaTimeModule.addSerializer(LocalDateTime.class, new LocalDateTimeSerializer(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
-        javaTimeModule.addSerializer(LocalDate.class, new LocalDateSerializer(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
-        javaTimeModule.addSerializer(LocalTime.class, new LocalTimeSerializer(DateTimeFormatter.ofPattern("HH:mm:ss")));
-        javaTimeModule.addDeserializer(LocalDateTime.class, new LocalDateTimeDeserializer(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
-        javaTimeModule.addDeserializer(LocalDate.class, new LocalDateDeserializer(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
-        javaTimeModule.addDeserializer(LocalTime.class, new LocalTimeDeserializer(DateTimeFormatter.ofPattern("HH:mm:ss")));
+
+        // 1.1 创建 SimpleModule 对象
+
+        SimpleModule javaTimeModule = new SimpleModule();
+        javaTimeModule
+                // 新增 Long 类型序列化规则，数值超过 2^53-1，在 JS 会出现精度丢失问题，因此 Long 自动序列化为字符串类型
+                .addSerializer(Long.class, NumberSerializer.INSTANCE)
+                .addSerializer(Long.TYPE, NumberSerializer.INSTANCE)
+//                .addSerializer(LocalDate.class, LocalDateSerializer.INSTANCE)
+//                .addDeserializer(LocalDate.class, LocalDateDeserializer.INSTANCE)
+                .addSerializer(LocalDate.class, new LocalDateSerializer(DateTimeFormatter.ofPattern("yyyy-MM-dd")))
+                .addDeserializer(LocalDate.class, new LocalDateDeserializer(DateTimeFormatter.ofPattern("yyyy-MM-dd")))
+//                .addSerializer(LocalTime.class, LocalTimeSerializer.INSTANCE)
+//                .addDeserializer(LocalTime.class, LocalTimeDeserializer.INSTANCE)
+                .addSerializer(LocalTime.class, new LocalTimeSerializer(DateTimeFormatter.ofPattern("HH:mm:ss")))
+                .addDeserializer(LocalTime.class, new LocalTimeDeserializer(DateTimeFormatter.ofPattern("HH:mm:ss")))
+                // 新增 LocalDateTime 序列化、反序列化规则，使用 Long 时间戳
+//                .addSerializer(LocalDateTime.class, TimestampLocalDateTimeSerializer.INSTANCE)
+//                .addDeserializer(LocalDateTime.class, TimestampLocalDateTimeDeserializer.INSTANCE)
+                .addSerializer(LocalDateTime.class, new LocalDateTimeSerializer(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
+                .addDeserializer(LocalDateTime.class, new CustomLocalDateTimeDeserializer())
+//                .addDeserializer(LocalDateTime.class, new LocalDateTimeDeserializer(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
+        ;
         mapper.registerModule(javaTimeModule);
 
-        SimpleModule simpleModule = new SimpleModule();
         //注册一个统一的枚举序列方法，实现IEnum接口的枚举序列化时取desc字段
+        SimpleModule simpleModule = new SimpleModule();
         simpleModule.addSerializer(IBaseEnum.class, new EnumsCodec());
         mapper.registerModule(simpleModule);
+
+        // 全局忽略 MultipartFile 类型
+        SimpleModule module = new SimpleModule();
+        module.addSerializer(MultipartFile.class, new JsonSerializer<MultipartFile>() {
+            @Override
+            public void serialize(MultipartFile value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
+                // 不做任何操作，直接忽略该字段
+                gen.writeNull();
+            }
+        });
+        mapper.registerModule(module);
 
         // 允许单引号、允许不带引号的字段名称
         mapper.configure(Feature.ALLOW_SINGLE_QUOTES, true);
@@ -75,17 +175,17 @@ public class JsonMapper{
         mapper.disable(MapperFeature.DEFAULT_VIEW_INCLUSION);
         mapper.disable(DeserializationFeature.FAIL_ON_NULL_CREATOR_PROPERTIES);
 
-        // 为mapper注册一个带有SerializerModifier的Factory，此modifier主要做的事情为：当序列化类型为array，list、set时，当值为空时，序列化成[]
-//        this.setSerializerFactory(this.getSerializerFactory().withSerializerModifier(new SerializerModifier()));
-//        // 空值处理为空串
-//        mapper.getSerializerProvider().setNullValueSerializer(new JsonSerializer<Object>(){
-//            @Override
-//            public void serialize(Object value, JsonGenerator jgen,
-//                                  SerializerProvider provider) throws IOException,
-//                    JsonProcessingException {
-//                jgen.writeString("");
-//            }
-//        });
+        ////             为mapper注册一个带有SerializerModifier的Factory，此modifier主要做的事情为：当序列化类型为array，list、set时，当值为空时，序列化成[]
+        //                    this.setSerializerFactory(this.getSerializerFactory().withSerializerModifier(new SerializerModifier()));
+        //                    // 空值处理为空串
+        //                    mapper.getSerializerProvider().setNullValueSerializer(new JsonSerializer<Object>(){
+        //                        @Override
+        //                        public void serialize(Object value, JsonGenerator jgen,
+        //                                              SerializerProvider provider) throws IOException,
+        //                                JsonProcessingException {
+        //                            jgen.writeString("");
+        //                        }
+        //                    });
         SimpleDateFormat formatter=new SimpleDateFormat(DateUtil.FORMAT_STR);
         mapper.setDateFormat(formatter);
         // 设置时区
@@ -118,7 +218,7 @@ public class JsonMapper{
      */
     public String toJson(Object object) {
         try {
-            return getObjectMapper().writeValueAsString(object);
+            return getObjectMapper(JsonEnum.BASE).writeValueAsString(object);
         } catch (IOException e) {
             logger.warn("write to json string error:" + object, e);
             return null;
@@ -139,7 +239,7 @@ public class JsonMapper{
             return null;
         }
         try {
-            return getObjectMapper().readValue(jsonString, clazz);
+            return getObjectMapper(JsonEnum.BASE).readValue(jsonString, clazz);
         } catch (IOException e) {
             logger.warn("parse json string error:" + jsonString, e);
             return null;
@@ -155,7 +255,7 @@ public class JsonMapper{
             return null;
         }
         try {
-            return (T) getObjectMapper().readValue(jsonString, javaType);
+            return (T) getObjectMapper(JsonEnum.BASE).readValue(jsonString, javaType);
         } catch (IOException e) {
             logger.warn("parse json string error:" + jsonString, e);
             return null;
@@ -167,7 +267,7 @@ public class JsonMapper{
             return null;
         }
         try {
-            return (T) getObjectMapper().readValue(jsonString, valueTypeRef);
+            return (T) getObjectMapper(JsonEnum.BASE).readValue(jsonString, valueTypeRef);
         } catch (IOException e) {
             logger.warn("parse json string error:" + jsonString, e);
             return null;
@@ -186,7 +286,7 @@ public class JsonMapper{
             return null;
         }
         try {
-            return getObjectMapper().readValue(file, clazz);
+            return getObjectMapper(JsonEnum.BASE).readValue(file, clazz);
         } catch (IOException e) {
             logger.warn("parse json file error:" + file.getAbsolutePath(), e);
             return null;
@@ -205,7 +305,7 @@ public class JsonMapper{
             return null;
         }
         try {
-            return getObjectMapper().readValue(inputStream, javaType);
+            return getObjectMapper(JsonEnum.BASE).readValue(inputStream, javaType);
         } catch (IOException e) {
             logger.warn("parse json file error:" , e);
             return null;
@@ -218,7 +318,7 @@ public class JsonMapper{
      * HashMap<String,MyBean>, 则调用(HashMap.class,String.class, MyBean.class)
      */
     public JavaType createCollectionType(Class<?> collectionClass, Class<?>... elementClasses) {
-        return getObjectMapper().getTypeFactory().constructParametricType(collectionClass, elementClasses);
+        return getObjectMapper(JsonEnum.BASE).getTypeFactory().constructParametricType(collectionClass, elementClasses);
     }
 
     /**
@@ -227,7 +327,7 @@ public class JsonMapper{
     @SuppressWarnings("unchecked")
     public <T> T update(String jsonString, T object) {
         try {
-            return (T) getObjectMapper().readerForUpdating(object).readValue(jsonString);
+            return (T) getObjectMapper(JsonEnum.BASE).readerForUpdating(object).readValue(jsonString);
         } catch (IOException e) {
             logger.warn("update json string:" + jsonString + " to object:" + object + " error.", e);
         }

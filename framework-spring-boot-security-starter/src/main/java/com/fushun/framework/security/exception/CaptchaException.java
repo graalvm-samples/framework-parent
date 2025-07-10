@@ -13,19 +13,19 @@ public class CaptchaException extends BaseException {
 
     private static final long serialVersionUID = 1L;
 
-    public CaptchaException(CaptchaException.ICaptchaExceptionEnum captchaExceptionEnum) {
+    public CaptchaException(ICaptchaExceptionEnum captchaExceptionEnum) {
         super(captchaExceptionEnum);
     }
 
-    public CaptchaException(CaptchaException.ICaptchaExceptionEnum captchaExceptionEnum, String logMessage) {
+    public CaptchaException(ICaptchaExceptionEnum captchaExceptionEnum, String logMessage) {
         super(captchaExceptionEnum, logMessage);
     }
 
-    public CaptchaException(Throwable cause, CaptchaException.ICaptchaExceptionEnum captchaExceptionEnum) {
+    public CaptchaException(Throwable cause, ICaptchaExceptionEnum captchaExceptionEnum) {
         super(cause, captchaExceptionEnum);
     }
 
-    public CaptchaException(Throwable cause, CaptchaException.ICaptchaExceptionEnum captchaExceptionEnum, String logMessage) {
+    public CaptchaException(Throwable cause, ICaptchaExceptionEnum captchaExceptionEnum, String logMessage) {
         super(cause, captchaExceptionEnum, logMessage);
     }
 
@@ -43,7 +43,7 @@ public class CaptchaException extends BaseException {
     /**
      * 异常错误定义
      */
-    public enum CaptchaExceptionEnum implements CaptchaException.ICaptchaExceptionEnum {
+    public enum CaptchaExceptionEnum implements ICaptchaExceptionEnum {
         GENERATE_ERROR( "生成验证码失败");
 
         private String msg;

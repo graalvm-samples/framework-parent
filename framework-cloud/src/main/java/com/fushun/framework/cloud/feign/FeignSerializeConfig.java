@@ -23,6 +23,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.fushun.framework.util.json.JsonEnum.BASE;
+
 @Configuration(proxyBeanMethods = false)
 @Slf4j
 public class FeignSerializeConfig {
@@ -30,14 +32,14 @@ public class FeignSerializeConfig {
     @Primary
     @Bean
     public Encoder feignEncoder() {
-        return new SpringEncoder(() -> new HttpMessageConverters(new MappingJackson2HttpMessageConverter(JsonMapper.getObjectMapper())));
+        return new SpringEncoder(() -> new HttpMessageConverters(new MappingJackson2HttpMessageConverter(JsonMapper.getObjectMapper(BASE))));
     }
 
     @Primary
     @Bean
     public Decoder feignDecoder() {
         MessageConverter wxConverter = new MessageConverter();
-        return new SpringDecoder(() -> new HttpMessageConverters(wxConverter, new MappingJackson2HttpMessageConverter(JsonMapper.getObjectMapper())));
+        return new SpringDecoder(() -> new HttpMessageConverters(wxConverter, new MappingJackson2HttpMessageConverter(JsonMapper.getObjectMapper(BASE))));
     }
 
     @Primary

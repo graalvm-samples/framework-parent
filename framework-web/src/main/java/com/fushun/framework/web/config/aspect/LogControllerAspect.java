@@ -53,7 +53,7 @@ public class LogControllerAspect {
         HttpServletRequest request = attributes.getRequest();
         // 记录下请求内容
 //        String controllerMethod = joinPoint.getSignature().getDeclaringTypeName() + "." + joinPoint.getSignature().getName();
-        String args = this.argsArrayToString(joinPoint.getArgs(), request.getMethod());
+        String args = LogControllerAspect.argsArrayToString(joinPoint.getArgs(), request.getMethod());
         Map<String, Object> headers = new HashMap<>();
 
 

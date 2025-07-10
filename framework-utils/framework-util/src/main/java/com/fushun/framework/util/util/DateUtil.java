@@ -1041,7 +1041,7 @@ public class DateUtil {
     public static LocalDateTime getCurrentWeekDayStartTime() {
         LocalDate today = LocalDate.now();
         LocalDateTime startOfDay = LocalDateTime.of(today, LocalTime.MIN);
-        return startOfDay.with(java.time.DayOfWeek.MONDAY);
+        return startOfDay.with(DayOfWeek.MONDAY);
     }
 
     /**
@@ -1052,7 +1052,7 @@ public class DateUtil {
     public static LocalDateTime getCurrentWeekDayEndTime() {
         LocalDate today = LocalDate.now();
         LocalDateTime endOfDay = LocalDateTime.of(today, LocalTime.MAX);
-        return endOfDay.with(java.time.DayOfWeek.SUNDAY);
+        return endOfDay.with(DayOfWeek.SUNDAY);
     }
 
     /**

@@ -1,8 +1,6 @@
 package com.fushun.framework.web.config.filter;
 
 import com.fushun.framework.util.util.UUIDUtil;
-import com.fushun.framework.web.config.aspect.LogControllerAspect;
-import eu.bitwalker.useragentutils.UserAgent;
 import jakarta.servlet.*;
 import jakarta.servlet.annotation.WebFilter;
 import jakarta.servlet.http.HttpServletRequest;
@@ -12,7 +10,6 @@ import org.slf4j.MDC;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
-import org.springframework.http.HttpMethod;
 
 import java.io.IOException;
 

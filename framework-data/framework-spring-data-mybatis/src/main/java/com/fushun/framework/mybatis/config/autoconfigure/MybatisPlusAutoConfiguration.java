@@ -112,13 +112,13 @@ import java.util.stream.Stream;
 @Configuration(proxyBeanMethods = false)
 @ConditionalOnClass({SqlSessionFactory.class, SqlSessionFactoryBean.class})
 @ConditionalOnSingleCandidate(DataSource.class)
-@EnableConfigurationProperties(com.baomidou.mybatisplus.autoconfigure.MybatisPlusProperties.class)
+@EnableConfigurationProperties(MybatisPlusProperties.class)
 @AutoConfigureAfter({DataSourceAutoConfiguration.class, MybatisPlusLanguageDriverAutoConfiguration.class})
 public class MybatisPlusAutoConfiguration implements InitializingBean {
 
     private static final Logger logger = LoggerFactory.getLogger(MybatisPlusAutoConfiguration.class);
 
-    private final com.baomidou.mybatisplus.autoconfigure.MybatisPlusProperties properties;
+    private final MybatisPlusProperties properties;
 
     private final Interceptor[] interceptors;
 
@@ -130,7 +130,7 @@ public class MybatisPlusAutoConfiguration implements InitializingBean {
 
     private final DatabaseIdProvider databaseIdProvider;
 
-    private final List<com.baomidou.mybatisplus.autoconfigure.ConfigurationCustomizer> configurationCustomizers;
+    private final List<ConfigurationCustomizer> configurationCustomizers;
 
     private final List<SqlSessionFactoryBeanCustomizer> sqlSessionFactoryBeanCustomizers;
 
@@ -138,13 +138,13 @@ public class MybatisPlusAutoConfiguration implements InitializingBean {
 
     private final ApplicationContext applicationContext;
 
-    public MybatisPlusAutoConfiguration(com.baomidou.mybatisplus.autoconfigure.MybatisPlusProperties properties,
+    public MybatisPlusAutoConfiguration(MybatisPlusProperties properties,
                                         ObjectProvider<Interceptor[]> interceptorsProvider,
                                         ObjectProvider<TypeHandler[]> typeHandlersProvider,
                                         ObjectProvider<LanguageDriver[]> languageDriversProvider,
                                         ResourceLoader resourceLoader,
                                         ObjectProvider<DatabaseIdProvider> databaseIdProvider,
-                                        ObjectProvider<List<com.baomidou.mybatisplus.autoconfigure.ConfigurationCustomizer>> configurationCustomizersProvider,
+                                        ObjectProvider<List<ConfigurationCustomizer>> configurationCustomizersProvider,
                                         ObjectProvider<List<SqlSessionFactoryBeanCustomizer>> sqlSessionFactoryBeanCustomizers,
                                         ObjectProvider<List<MybatisPlusPropertiesCustomizer>> mybatisPlusPropertiesCustomizerProvider,
                                         ApplicationContext applicationContext) {
@@ -396,7 +396,7 @@ public class MybatisPlusAutoConfiguration implements InitializingBean {
     @Order
     @Bean
     @ConditionalOnMissingBean
-    public com.baomidou.mybatisplus.autoconfigure.DdlApplicationRunner ddlApplicationRunner(@Autowired(required = false) List<IDdl> ddlList) {
+    public DdlApplicationRunner ddlApplicationRunner(@Autowired(required = false) List<IDdl> ddlList) {
         return new DdlApplicationRunner(ddlList);
     }
 }
